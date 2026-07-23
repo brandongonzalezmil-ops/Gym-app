@@ -1,0 +1,202 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #222;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #1a1a2e;
+}
+
+a {
+    color: #4361ee;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Lista de máquinas */
+.lista-maquinas {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.tarjeta-maquina {
+    background: white;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.tarjeta-maquina a {
+    font-size: 1.1em;
+}
+
+/* Tabla de historial */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background-color: #4361ee;
+    color: white;
+}
+
+tr:hover td {
+    background-color: #f0f4ff;
+}
+
+/* Formularios */
+form {
+    margin: 0;
+}
+
+input[type="number"], select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+button {
+    background-color: #4361ee;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    background-color: #2f4bd0;
+}
+
+/* Botón de borrar en rojo */
+form[action*="borrar"] button {
+    background-color: #e63946;
+}
+
+form[action*="borrar"] button:hover {
+    background-color: #c62d3a;
+}
+
+/* Formulario de agregar registro */
+.form-agregar {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    max-width: 400px;
+    margin-top: 10px;
+}
+
+.form-agregar label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+/* Lista anidada de día -> máquina -> personas */
+.lista-dia {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.item-maquina {
+    background: white;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.item-maquina > a {
+    font-size: 1.15em;
+}
+
+.lista-pesos {
+    list-style: none;
+    padding-left: 15px;
+    margin-top: 8px;
+    border-left: 3px solid #4361ee;
+}
+
+.lista-pesos li {
+    padding: 4px 0;
+    color: #444;
+}
+
+.sin-registros {
+    font-size: 0.85em;
+    color: #999;
+    margin: 8px 0 0 15px;
+}
+/* Pestañas de días */
+.pestanas-dias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.pestana {
+    background: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    color: #444;
+    font-weight: 600;
+}
+
+.pestana:hover {
+    text-decoration: none;
+    background: #eef1ff;
+}
+
+.pestana.activa {
+    background: #4361ee;
+    color: white;
+}
+
+.foto-maquina {
+    width: 100%;
+    max-width: 250px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.foto-maquina-grande {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+    margin: 10px 0;
+    display: block;
+}

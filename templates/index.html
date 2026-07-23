@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gym App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+<h1>💪 Máquinas</h1>
+<a href="/usuarios">👥 Ver/agregar usuarios</a>
+
+    <div class="pestanas-dias">
+        {% for d in dias %}
+            <a href="/?dia={{ d }}" class="pestana {% if d == dia_seleccionado %}activa{% endif %}">{{ d }}</a>
+        {% endfor %}
+    </div>
+
+    <h2>{{ dia_seleccionado }}</h2>
+
+    {% if maquinas %}
+    <ul class="lista-dia">
+        {% for maquina in maquinas %}
+            <li class="item-maquina">
+                {% if maquina.imagen_url %}
+    <img src="{{ url_for('static', filename='imagenes/' + maquina.imagen_url) }}" class="foto-maquina" alt="{{ maquina.nombre }}">
+{% endif %}
+<a href="/maquina/{{ maquina.id }}">{{ maquina.nombre }}</a>
+                {% if maquina.pesos %}
+                <ul class="lista-pesos">
+                    {% for p in maquina.pesos %}
+                        <li>{{ p.nombre }} — {{ p.peso_kg }} kg {% if p.repeticiones %}× {{ p.repeticiones }} reps{% endif %}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="sin-registros">Nadie ha registrado peso aquí</p>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>No hay máquinas asignadas a este día todavía.</p>
+    {% endif %}
+</body>
+</html>
