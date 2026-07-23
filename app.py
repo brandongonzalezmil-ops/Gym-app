@@ -42,7 +42,7 @@ def index():
     for m in maquinas:
         m["pesos"] = pesos_por_maquina.get(m["id"], [])
 
-    dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    dias = ["Lunes", "Martes", "Jueves", "Viernes"]
 
     return render_template("index.html", maquinas=maquinas, dias=dias, dia_seleccionado=dia_seleccionado)
 
