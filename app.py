@@ -1,21 +1,23 @@
 from flask import Flask, render_template, request, redirect, url_for
-import mysql.connector
-from config import DB_CONFIG
+import sqlite3
+from config import DB_PATH
 
 app = Flask(__name__)
 
 def get_conexion():
-    return mysql.connector.connect(**DB_CONFIG)
+    conexion = sqlite3.connect(DB_PATH)
+    conexion.row_factory = sqlite3.Row
+    return conexion
 
 @app.route("/")
 def index():
     dia_seleccionado = request.args.get("dia", "Lunes")
 
     conexion = get_conexion()
-    cursor = conexion.cursor(dictionary=True)
+    cursor = conexion.cursor()
 
-    cursor.execute("SELECT * FROM maquinas WHERE dia = %s", (dia_seleccionado,))
-    maquinas = cursor.fetchall()
+    cursor.execute("SELECT * FROM maquinas WHERE dia = ?", (dia_seleccionado,))
+    maquinas = [dict(row) for row in cursor.fetchall()]
 
     cursor.execute("""
         SELECT rp.maquina_id, u.nombre, rp.peso_kg, rp.repeticiones
@@ -29,9 +31,8 @@ def index():
                  AND rp.usuario_id = ultimo.usuario_id
                  AND rp.fecha = ultimo.max_fecha
     """)
-    pesos = cursor.fetchall()
+    pesos = [dict(row) for row in cursor.fetchall()]
 
-    cursor.close()
     conexion.close()
 
     pesos_por_maquina = {}
@@ -41,7 +42,7 @@ def index():
     for m in maquinas:
         m["pesos"] = pesos_por_maquina.get(m["id"], [])
 
-    dias = ["Lunes", "Martes", "Jueves", "Viernes"]
+    dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
     return render_template("index.html", maquinas=maquinas, dias=dias, dia_seleccionado=dia_seleccionado)
 
@@ -49,25 +50,23 @@ def index():
 @app.route("/maquina/<int:id>")
 def detalle_maquina(id):
     conexion = get_conexion()
-    cursor = conexion.cursor(dictionary=True)
+    cursor = conexion.cursor()
 
-    cursor.execute("SELECT * FROM maquinas WHERE id = %s", (id,))
-    maquina = cursor.fetchone()
+    cursor.execute("SELECT * FROM maquinas WHERE id = ?", (id,))
+    maquina = dict(cursor.fetchone())
 
     cursor.execute("""
         SELECT registros_peso.id, registros_peso.peso_kg, registros_peso.repeticiones, registros_peso.fecha, usuarios.nombre
         FROM registros_peso
         JOIN usuarios ON registros_peso.usuario_id = usuarios.id
-        WHERE registros_peso.maquina_id = %s
+        WHERE registros_peso.maquina_id = ?
         ORDER BY registros_peso.fecha DESC
     """, (id,))
-
-    registros = cursor.fetchall()
+    registros = [dict(row) for row in cursor.fetchall()]
 
     cursor.execute("SELECT * FROM usuarios")
-    usuarios = cursor.fetchall()
+    usuarios = [dict(row) for row in cursor.fetchall()]
 
-    cursor.close()
     conexion.close()
 
     return render_template("maquina.html", maquina=maquina, registros=registros, usuarios=usuarios)
@@ -82,11 +81,10 @@ def agregar_registro(id):
     conexion = get_conexion()
     cursor = conexion.cursor()
     cursor.execute(
-        "INSERT INTO registros_peso (usuario_id, maquina_id, peso_kg, repeticiones) VALUES (%s, %s, %s, %s)",
+        "INSERT INTO registros_peso (usuario_id, maquina_id, peso_kg, repeticiones) VALUES (?, ?, ?, ?)",
         (usuario_id, id, peso_kg, repeticiones)
     )
     conexion.commit()
-    cursor.close()
     conexion.close()
 
     return redirect(url_for("detalle_maquina", id=id))
@@ -98,18 +96,17 @@ def editar_registro(id):
     repeticiones = request.form["repeticiones"]
 
     conexion = get_conexion()
-    cursor = conexion.cursor(dictionary=True)
+    cursor = conexion.cursor()
 
-    cursor.execute("SELECT maquina_id FROM registros_peso WHERE id = %s", (id,))
+    cursor.execute("SELECT maquina_id FROM registros_peso WHERE id = ?", (id,))
     registro = cursor.fetchone()
     maquina_id = registro["maquina_id"]
 
     cursor.execute(
-        "UPDATE registros_peso SET peso_kg = %s, repeticiones = %s WHERE id = %s",
+        "UPDATE registros_peso SET peso_kg = ?, repeticiones = ? WHERE id = ?",
         (peso_kg, repeticiones, id)
     )
     conexion.commit()
-    cursor.close()
     conexion.close()
 
     return redirect(url_for("detalle_maquina", id=maquina_id))
@@ -118,26 +115,25 @@ def editar_registro(id):
 @app.route("/registro/<int:id>/borrar", methods=["POST"])
 def borrar_registro(id):
     conexion = get_conexion()
-    cursor = conexion.cursor(dictionary=True)
+    cursor = conexion.cursor()
 
-    cursor.execute("SELECT maquina_id FROM registros_peso WHERE id = %s", (id,))
+    cursor.execute("SELECT maquina_id FROM registros_peso WHERE id = ?", (id,))
     registro = cursor.fetchone()
     maquina_id = registro["maquina_id"]
 
-    cursor.execute("DELETE FROM registros_peso WHERE id = %s", (id,))
+    cursor.execute("DELETE FROM registros_peso WHERE id = ?", (id,))
     conexion.commit()
-    cursor.close()
     conexion.close()
 
     return redirect(url_for("detalle_maquina", id=maquina_id))
 
+
 @app.route("/usuarios")
 def usuarios():
     conexion = get_conexion()
-    cursor = conexion.cursor(dictionary=True)
+    cursor = conexion.cursor()
     cursor.execute("SELECT * FROM usuarios ORDER BY nombre")
-    usuarios = cursor.fetchall()
-    cursor.close()
+    usuarios = [dict(row) for row in cursor.fetchall()]
     conexion.close()
     return render_template("usuarios.html", usuarios=usuarios)
 
@@ -149,12 +145,12 @@ def agregar_usuario():
     if nombre:
         conexion = get_conexion()
         cursor = conexion.cursor()
-        cursor.execute("INSERT INTO usuarios (nombre) VALUES (%s)", (nombre,))
+        cursor.execute("INSERT INTO usuarios (nombre) VALUES (?)", (nombre,))
         conexion.commit()
-        cursor.close()
         conexion.close()
 
     return redirect(url_for("usuarios"))
 
+
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True)
