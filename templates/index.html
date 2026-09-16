@@ -21,8 +21,10 @@
     <ul class="lista-dia">
         {% for maquina in maquinas %}
             <li class="item-maquina">
-                {% if maquina.imagen_url %}
-    <img src="{{ url_for('static', filename='imagenes/' + maquina.imagen_url) }}" class="foto-maquina" alt="{{ maquina.nombre }}">
+             {% if maquina.fotos %}
+    {% for foto in maquina.fotos %}
+        <img src="{{ url_for('static', filename='imagenes/' + foto) }}" class="foto-maquina" alt="{{ maquina.nombre }}">
+    {% endfor %}
 {% endif %}
 <a href="/maquina/{{ maquina.id }}">{{ maquina.nombre }}</a>
                 {% if maquina.pesos %}

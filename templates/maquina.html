@@ -10,8 +10,10 @@
     <h1>{{ maquina.nombre }}</h1>
     <p>{{ maquina.descripcion }}</p>
  <p>{{ maquina.descripcion }}</p>
-{% if maquina.imagen_url %}
-    <img src="{{ url_for('static', filename='imagenes/' + maquina.imagen_url) }}" class="foto-maquina-grande" alt="{{ maquina.nombre }}">
+{% if maquina.fotos %}
+    {% for foto in maquina.fotos %}
+        <img src="{{ url_for('static', filename='imagenes/' + foto) }}" class="foto-maquina-grande" alt="{{ maquina.nombre }}">
+    {% endfor %}
 {% endif %}
     <h2>Historial de peso</h2>
     <table>
@@ -23,7 +25,7 @@
     <th>Acción</th>
     <th>Borrar</th>
 </tr>
-        {% for r in registros %}
+           {% for r in registros %}
         <tr>
         <form action="/registro/{{ r.id }}/editar" method="POST">
 <td>{{ r.nombre }}</td>
@@ -38,7 +40,11 @@
     <button type="submit">Actualizar</button>
 </td>
 </form>
-            </td>
+<td>
+    <form action="/registro/{{ r.id }}/borrar" method="POST" onsubmit="return confirm('¿Seguro que quieres borrar este registro?');">
+        <button type="submit">Borrar</button>
+    </form>
+</td>
         </tr>
         {% endfor %}
     </table>

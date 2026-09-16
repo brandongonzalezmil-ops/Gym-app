@@ -19,6 +19,10 @@ def index():
     cursor.execute("SELECT * FROM maquinas WHERE dia = ?", (dia_seleccionado,))
     maquinas = [dict(row) for row in cursor.fetchall()]
 
+    for m in maquinas:
+        cursor.execute("SELECT imagen_url FROM fotos_maquinas WHERE maquina_id = ?", (m["id"],))
+        m["fotos"] = [row["imagen_url"] for row in cursor.fetchall()]
+
     cursor.execute("""
         SELECT rp.maquina_id, u.nombre, rp.peso_kg, rp.repeticiones
         FROM registros_peso rp
@@ -54,6 +58,9 @@ def detalle_maquina(id):
 
     cursor.execute("SELECT * FROM maquinas WHERE id = ?", (id,))
     maquina = dict(cursor.fetchone())
+
+    cursor.execute("SELECT imagen_url FROM fotos_maquinas WHERE maquina_id = ?", (id,))
+    maquina["fotos"] = [row["imagen_url"] for row in cursor.fetchall()]
 
     cursor.execute("""
         SELECT registros_peso.id, registros_peso.peso_kg, registros_peso.repeticiones, registros_peso.fecha, usuarios.nombre
